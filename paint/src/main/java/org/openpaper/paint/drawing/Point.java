@@ -1,9 +1,16 @@
 package org.openpaper.paint.drawing;
 
+/**
+ * A simple point with an x,y coordinate and a timestamp of when it was created.
+ * 
+ * @author erwinj
+ * 
+ */
 public class Point {
     public final float x;
     public final float y;
     public final long time;
+    private float pressure;
 
     public float distanceTo(Point other) {
         if (other == null)
@@ -26,30 +33,12 @@ public class Point {
         this.time = System.currentTimeMillis();
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (time ^ (time >>> 32));
-        result = prime * result + Float.floatToIntBits(x);
-        result = prime * result + Float.floatToIntBits(y);
-        return result;
+    public Point(float x, float y, float pressure) {
+        this(x, y);
+        this.pressure = pressure;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Point other = (Point) obj;
-        if (Float.floatToIntBits(x) != Float.floatToIntBits(other.x))
-            return false;
-        if (Float.floatToIntBits(y) != Float.floatToIntBits(other.y))
-            return false;
-        return true;
+    public float getPressure() {
+        return pressure;
     }
-
 }

@@ -93,8 +93,6 @@ public class DrawingView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float eventX = event.getX();
-        float eventY = event.getY();
 
         switch (event.getAction()) {
         case MotionEvent.ACTION_DOWN:
@@ -111,11 +109,12 @@ public class DrawingView extends View {
             for (int i = 0; i < historySize; i++) {
                 float historicalX = event.getHistoricalX(i);
                 float historicalY = event.getHistoricalY(i);
-                addPoint(new Point(historicalX, historicalY));
+                float pressure = event.getHistoricalPressure(i);
+                addPoint(new Point(historicalX, historicalY, pressure));
             }
 
             // After replaying history, connect the line to the touch point.
-            addPoint(new Point(eventX, eventY));
+            addPoint(new Point(event.getX(), event.getY(), event.getPressure()));
             break;
 
         default:

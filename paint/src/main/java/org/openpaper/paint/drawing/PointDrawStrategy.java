@@ -26,6 +26,15 @@ public class PointDrawStrategy implements DrawStrategy {
         paint.setStrokeWidth(5f);
     }
 
+    public PointDrawStrategy(int color) {
+        paint.setAntiAlias(true);
+        paint.setColor(color);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeJoin(Paint.Join.ROUND);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        paint.setStrokeWidth(5f);
+    }
+
     public PointDrawStrategy(Paint paint) {
         this.paint = paint;
     }
@@ -45,7 +54,8 @@ public class PointDrawStrategy implements DrawStrategy {
     public void clear() {
     }
 
-    public void setPaint(Paint newPaint) {
-        this.paint = newPaint;
+    @Override
+    public void setColor(int color) {
+        this.paint.setColor(color);
     }
 }

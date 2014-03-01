@@ -3,6 +3,7 @@ package org.openpaper.paint.drawing;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Stack;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -11,6 +12,7 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -31,15 +33,14 @@ import android.view.View;
  */
 @TargetApi(Build.VERSION_CODES.CUPCAKE)
 public class DrawingView extends View {
-
     private static final String TAG = "com.rwin.randy.ui.SignatureView";
 
     private Bitmap bitmap = null;
     private Canvas bitmapCanvas = null;
-    
+
     private Bitmap snapshot = null;
     private Canvas snapshotCanvas = null;
-    
+
     private DrawStrategy drawStrategy = new PointDrawStrategy();
 
     private Stack<Point> history = new Stack<Point>();
@@ -84,7 +85,7 @@ public class DrawingView extends View {
     public int getRedoHistory() {
         return redo.size();
     }
-    
+
     @Override
     protected void onDraw(Canvas canvas) {
         if (bitmap != null)
@@ -93,7 +94,6 @@ public class DrawingView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
         switch (event.getAction()) {
         case MotionEvent.ACTION_DOWN:
             redo.clear();
@@ -131,6 +131,10 @@ public class DrawingView extends View {
 
     public void removePropertyChangeListener(PropertyChangeListener pcl) {
         this.pcs.removePropertyChangeListener(pcl);
+    }
+
+    public DrawStrategy getStrategy() {
+        return this.drawStrategy;
     }
 
     public void setDrawStrategy(DrawStrategy strategy) {

@@ -42,6 +42,13 @@ public class BezierDrawStrategy implements DrawStrategy {
 
     @Override
     public Rect addPoint(Canvas c, Point newPoint) {
+
+        // Okay, the user lifted their pen.
+        if (newPoint == null) {
+            this.pointQueue.clear();
+            return null;
+        }
+
         this.pointQueue.offer(newPoint);
         if (this.pointQueue.size() < 4)
             return null;
@@ -91,5 +98,10 @@ public class BezierDrawStrategy implements DrawStrategy {
     @Override
     public void clear() {
         this.pointQueue.clear();
+    }
+
+    @Override
+    public void setColor(int color) {
+        this.paint.setColor(color);
     }
 }

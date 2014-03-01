@@ -27,4 +27,11 @@ public interface DrawStrategy {
     Rect addPoint(Canvas c, Point p);
 
     void clear();
+
+    /**
+     * Sets the color that should be used by this drawing strategy.
+     * 
+     * @param color The color to be used while drawing.
+     */
+    void setColor(int color);
 }

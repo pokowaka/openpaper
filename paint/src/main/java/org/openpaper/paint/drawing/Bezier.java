@@ -34,7 +34,7 @@ public class Bezier {
         this.control1 = control1;
         this.control2 = control2;
         
-        
+        // Poor approximation of how many points we will draw...
         Rect bb = getBoundingBox();
         float dx = bb.right - bb.left;
         float dy = bb.bottom - bb.top;

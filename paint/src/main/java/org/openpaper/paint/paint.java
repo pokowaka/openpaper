@@ -1,12 +1,10 @@
 package org.openpaper.paint;
 
-import org.openpaper.paint.drawing.BezierDrawStrategy;
 import org.openpaper.paint.drawing.ColorChooser;
 import org.openpaper.paint.drawing.ColorChooser.ColorChooserListener;
 import org.openpaper.paint.drawing.DrawingView;
 import org.openpaper.paint.drawing.PencilStrategy;
 import org.openpaper.paint.drawing.PointDrawStrategy;
-import org.openpaper.paint.util.SystemUiHider;
 
 import android.app.Activity;
 import android.os.Bundle;

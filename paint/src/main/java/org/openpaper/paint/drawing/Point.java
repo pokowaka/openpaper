@@ -11,7 +11,7 @@ import android.graphics.RectF;
 public class Point {
     public final float x;
     public final float y;
-    public final long time;
+    public long time;
     private float pressure;
 
     public float distanceTo(Point other) {
@@ -29,14 +29,18 @@ public class Point {
     }
 
     public Point(float x, float y) {
-        super();
-        this.x = x;
-        this.y = y;
-        this.time = System.currentTimeMillis();
+        this(x, y, 0, 0);
     }
 
     public Point(float x, float y, float pressure) {
-        this(x, y);
+        this(x, y, pressure, 0);
+    }
+
+    public Point(float x, float y, float pressure, long time) {
+        super();
+        this.x = x;
+        this.y = y;
+        this.time = time;
         this.pressure = pressure;
     }
 
@@ -44,7 +48,6 @@ public class Point {
         return pressure;
     }
 
-    
     @Override
     public String toString() {
         return "Point [x=" + x + ", y=" + y + ", time=" + time + ", pressure="

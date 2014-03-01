@@ -68,6 +68,7 @@ public class DrawingView extends View {
         history.push(newPoint);
         pcs.firePropertyChange("history", size, history.size());
 
+        Log.i(TAG, "Point: " + newPoint);
         // Draw an invalidate.
         Rect dirty = drawStrategy.addPoint(bitmapCanvas, newPoint);
         if (dirty != null) {
@@ -115,11 +116,12 @@ public class DrawingView extends View {
                 float historicalX = event.getHistoricalX(i);
                 float historicalY = event.getHistoricalY(i);
                 float pressure = event.getHistoricalPressure(i);
-                addPoint(new Point(historicalX, historicalY, pressure));
+                long time = event.getHistoricalEventTime(i);
+                addPoint(new Point(historicalX, historicalY, pressure, time));
             }
 
             // After replaying history, connect the line to the touch point.
-            addPoint(new Point(event.getX(), event.getY(), event.getPressure()));
+            addPoint(new Point(event.getX(), event.getY(), event.getPressure(), event.getEventTime()));
             break;
 
         default:

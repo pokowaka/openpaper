@@ -107,6 +107,8 @@ public class PencilStrategy implements DrawStrategy {
             p.lineTo(a.x, a.y);
         }
 
+        // Make sure we leave no gap..
+        p.lineTo(p1.x, p1.y);
         canvas.drawPath(p, paint);
     }
 

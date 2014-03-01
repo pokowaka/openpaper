@@ -8,11 +8,13 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -43,6 +45,8 @@ public class DrawingView extends View {
 
     private DrawStrategy drawStrategy = new PointDrawStrategy();
 
+    
+    // Todo, need to keep track of strategy as well :-)...
     private Stack<Point> history = new Stack<Point>();
     private Stack<Point> redo = new Stack<Point>();
 
@@ -66,8 +70,9 @@ public class DrawingView extends View {
 
         // Draw an invalidate.
         Rect dirty = drawStrategy.addPoint(bitmapCanvas, newPoint);
-        if (dirty != null)
-            invalidate(dirty);
+        if (dirty != null) {
+            invalidate();
+        }
     }
 
     public void clear() {

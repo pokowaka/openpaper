@@ -1,5 +1,7 @@
 package org.openpaper.paint.drawing;
 
+import android.graphics.RectF;
+
 /**
  * A simple point with an x,y coordinate and a timestamp of when it was created.
  * 
@@ -41,4 +43,12 @@ public class Point {
     public float getPressure() {
         return pressure;
     }
+
+    
+    @Override
+    public String toString() {
+        return "Point [x=" + x + ", y=" + y + ", time=" + time + ", pressure="
+                + pressure + "]";
+    }
+
 }

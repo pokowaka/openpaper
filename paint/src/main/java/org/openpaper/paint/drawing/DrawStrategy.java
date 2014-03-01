@@ -10,7 +10,7 @@ import android.graphics.Rect;
  * @author erwinj
  * 
  */
-public interface DrawStrategy {
+public interface DrawStrategy extends Cloneable {
 
     /**
      * A new point has been added to canvas. This is called during touch events.
@@ -31,7 +31,9 @@ public interface DrawStrategy {
     /**
      * Sets the color that should be used by this drawing strategy.
      * 
-     * @param color The color to be used while drawing.
+     * @param color
+     *            The color to be used while drawing.
      */
     void setColor(int color);
+
 }

@@ -4,6 +4,7 @@ import org.openpaper.paint.drawing.BezierDrawStrategy;
 import org.openpaper.paint.drawing.ColorChooser;
 import org.openpaper.paint.drawing.ColorChooser.ColorChooserListener;
 import org.openpaper.paint.drawing.DrawingView;
+import org.openpaper.paint.drawing.PencilStrategy;
 import org.openpaper.paint.drawing.PointDrawStrategy;
 import org.openpaper.paint.util.SystemUiHider;
 
@@ -27,8 +28,18 @@ public class paint extends Activity {
         setContentView(R.layout.activity_paint);
         final DrawingView drawingView = (DrawingView) findViewById(R.id.drawingView);
         final ColorChooser cc = (ColorChooser) findViewById(R.id.colorChooser1);
+
+        final Button undo = (Button) findViewById(R.id.undo);
         final Button eraser = (Button) findViewById(R.id.eraser);
         final Button ink = (Button) findViewById(R.id.ink);
+
+        undo.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View paramView) {
+                drawingView.undo(10);
+            }
+        });
 
         eraser.setOnClickListener(new OnClickListener() {
 
@@ -43,7 +54,7 @@ public class paint extends Activity {
 
             @Override
             public void onClick(View paramView) {
-                drawingView.setDrawStrategy(new BezierDrawStrategy(0.7f, 5, cc
+                drawingView.setDrawStrategy(new PencilStrategy(cc
                         .getSelectedColor()));
             }
         });

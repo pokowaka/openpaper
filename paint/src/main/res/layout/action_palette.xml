@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
+    <Button
+        android:id="@+id/eraser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="eraser" />
+
+    <Button
+        android:id="@+id/ink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ink" />
+   
+   <Button
+        android:id="@+id/undo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="undo" />
+    
+    <org.openpaper.paint.drawing.ColorChooser
+        android:id="@+id/colorChooser1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+    </org.openpaper.paint.drawing.ColorChooser>
+
+</LinearLayout>

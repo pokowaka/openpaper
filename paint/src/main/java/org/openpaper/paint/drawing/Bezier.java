@@ -1,48 +1,54 @@
 package org.openpaper.paint.drawing;
 
+import org.openpaper.paint.util.Bounds;
+
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Log;
 
 public class Bezier {
 
-    private Point startPoint;
-    private Point endPoint;
-    private Point control1;
-    private Point control2;
+    private static final String TAG = "org.openpaper.paint.drawing.Bezier";
+
+    private Point p0;
+    private Point p1;
+    private Point p2;
+    private Point p3;
     private int drawSteps;
 
+    private Rect bb;
+
     public Rect getBoundingBox() {
-        int minx = (int) Math.floor(Math.min(
-                Math.min(startPoint.x, endPoint.x),
-                Math.min(control1.x, control2.x)));
-        int miny = (int) Math.floor(Math.min(
-                Math.min(startPoint.y, endPoint.y),
-                Math.min(control1.y, control2.y)));
-        int maxx = (int) Math.ceil(Math.max(Math.max(startPoint.x, endPoint.x),
-                Math.max(control1.x, control2.x)));
-        int maxy = (int) Math.ceil(Math.max(Math.max(startPoint.y, endPoint.y),
-                Math.max(control1.y, control2.y)));
-        return new Rect(minx, miny, maxx, maxy);
+        return bb;
     }
 
     public Bezier(Point startPoint, Point control1, Point control2,
             Point endPoint) {
         super();
-        this.startPoint = startPoint;
-        this.endPoint = endPoint;
-        this.control1 = control1;
-        this.control2 = control2;
-        
+        this.p0 = startPoint;
+        this.p3 = endPoint;
+        this.p1 = control1;
+        this.p2 = control2;
+
+        // Now let's approximate the bounding box..
+        this.bb = new Rect(Integer.MAX_VALUE, Integer.MAX_VALUE,
+                Integer.MIN_VALUE, Integer.MIN_VALUE);
+
+        final int APPROX = 128;
+        for (int i = 0; i < APPROX; i++) {
+            Bounds.extendRect(calculatePoint(i / APPROX), bb);
+        }
+
+        Bounds.extendRect(p0, bb);
+        Bounds.extendRect(p1, bb);
+        Bounds.extendRect(p2, bb);
+        Bounds.extendRect(p3, bb);
+
         // Poor approximation of how many points we will draw...
-        Rect bb = getBoundingBox();
         float dx = bb.right - bb.left;
         float dy = bb.bottom - bb.top;
-        drawSteps = (int) (2 * Math.sqrt(dx*dx + dy * dy)); 
-    }
-
-    public void draw(Canvas canvas, Paint paint) {
-        draw(canvas, paint, paint.getStrokeWidth(), paint.getStrokeWidth());
+        drawSteps = (int) (2 * Math.sqrt(dx * dx + dy * dy));
     }
 
     public Point calculatePoint(float t) {
@@ -52,15 +58,15 @@ public class Bezier {
         float uu = u * u;
         float uuu = uu * u;
 
-        float x = uuu * startPoint.x;
-        x += 3 * uu * t * control1.x;
-        x += 3 * u * tt * control2.x;
-        x += ttt * endPoint.x;
+        float x = uuu * p0.x;
+        x += 3 * uu * t * p1.x;
+        x += 3 * u * tt * p2.x;
+        x += ttt * p3.x;
 
-        float y = uuu * startPoint.y;
-        y += 3 * uu * t * control1.y;
-        y += 3 * u * tt * control2.y;
-        y += ttt * endPoint.y;
+        float y = uuu * p0.y;
+        y += 3 * uu * t * p1.y;
+        y += 3 * u * tt * p2.y;
+        y += ttt * p3.y;
 
         return new Point(x, y);
     }
@@ -69,18 +75,18 @@ public class Bezier {
     public void draw(Canvas canvas, Paint paint, float startWidth,
             float endWidth) {
         float originalWidth = paint.getStrokeWidth();
-        float widthDelta = endWidth - startWidth;
+        float widthDelta = (endWidth - startWidth) / drawSteps;
 
         for (int i = 0; i < drawSteps; i++) {
             // Calculate the Bezier (x, y) coordinate for this step.
             float t = ((float) i) / drawSteps;
             Point pt = calculatePoint(t);
-            // Set the incremental stroke width and draw.
-            paint.setStrokeWidth(startWidth + t * t * t * widthDelta);
-            canvas.drawPoint(pt.x, pt.y, paint);
-            ;
-        }
 
+            // Set the incremental stroke width and draw.
+            paint.setStrokeWidth(startWidth + t * widthDelta);
+            canvas.drawPoint(pt.x, pt.y, paint);
+
+        }
         paint.setStrokeWidth(originalWidth);
     }
 }

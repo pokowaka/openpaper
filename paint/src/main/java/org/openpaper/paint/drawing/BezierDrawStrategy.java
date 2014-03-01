@@ -50,30 +50,32 @@ public class BezierDrawStrategy implements DrawStrategy {
         }
 
         this.pointQueue.offer(newPoint);
-        if (this.pointQueue.size() < 4)
-            return null;
-
         int velocity = (int) newPoint.velocityFrom(lastPoint);
 
         // A simple lowpass filter to mitigate velocity aberrations.
         velocity = (int) (velocityFilter * velocity + (1 - velocityFilter)
                 * lastVelocity);
 
-        float newWidth = strokeWidth - velocity * 5;
-        // The Bezier's width starts out as last curve's final width, and
-        // gradually changes to the stroke width just calculated. The new
-        // width calculation is based on the velocity between the Bezier's
-        // start and end points.
+        float newWidth = strokeWidth - velocity;
 
-        // Note we keep the last element in the queue, so that the next
-        // curve can be added properly.
-        Bezier curve = new Bezier(this.pointQueue.poll(),
-                this.pointQueue.poll(), this.pointQueue.poll(),
-                this.pointQueue.peek());
-        Rect invalid = addBezier(c, curve, lastWidth, newWidth);
-        lastWidth = newWidth;
+        Rect invalid = null;
+        if (this.pointQueue.size() >= 4) {
 
-        lastPoint = newPoint;
+            // The Bezier's width starts out as last curve's final width, and
+            // gradually changes to the stroke width just calculated. The new
+            // width calculation is based on the velocity between the Bezier's
+            // start and end points.
+
+            // Note we keep the last element in the queue, so that the next
+            // curve can be added properly.
+            Bezier curve = new Bezier(this.pointQueue.poll(),
+                    this.pointQueue.poll(), this.pointQueue.poll(),
+                    this.pointQueue.peek());
+            invalid = addBezier(c, curve, lastWidth, newWidth);
+            lastPoint = newPoint;
+            lastWidth = newWidth;
+        }
+
         lastVelocity = velocity;
 
         return invalid;
@@ -91,7 +93,6 @@ public class BezierDrawStrategy implements DrawStrategy {
         bound.right += width;
         bound.top -= width;
         bound.bottom += width;
-
         return bound;
     }
 

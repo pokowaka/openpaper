@@ -1,10 +1,13 @@
 package org.openpaper.paint;
 
+import org.openpaper.paint.action.ActionQueue;
+import org.openpaper.paint.action.BrushSelector;
 import org.openpaper.paint.drawing.ColorChooser;
 import org.openpaper.paint.drawing.ColorChooser.ColorChooserListener;
+import org.openpaper.paint.drawing.brush.Brush;
+import org.openpaper.paint.drawing.brush.PencilBrush;
+import org.openpaper.paint.drawing.brush.PointBrush;
 import org.openpaper.paint.drawing.DrawingView;
-import org.openpaper.paint.drawing.PencilStrategy;
-import org.openpaper.paint.drawing.PointDrawStrategy;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -28,14 +31,25 @@ public class paint extends Activity {
         final ColorChooser cc = (ColorChooser) findViewById(R.id.colorChooser1);
 
         final Button undo = (Button) findViewById(R.id.undo);
+        final Button redo = (Button) findViewById(R.id.redo);
+
         final Button eraser = (Button) findViewById(R.id.eraser);
         final Button ink = (Button) findViewById(R.id.ink);
+        final ActionQueue ac = drawingView.getActionQueue();
 
         undo.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View paramView) {
-                drawingView.undo(10);
+                ac.undo(100);
+            }
+        });
+
+        redo.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View paramView) {
+                ac.redo(100);
             }
         });
 
@@ -43,7 +57,7 @@ public class paint extends Activity {
 
             @Override
             public void onClick(View paramView) {
-                drawingView.setDrawStrategy(new PointDrawStrategy(cc
+                ac.addAction(new BrushSelector(PointBrush.class, cc
                         .getSelectedColor()));
             }
         });
@@ -52,7 +66,7 @@ public class paint extends Activity {
 
             @Override
             public void onClick(View paramView) {
-                drawingView.setDrawStrategy(new PencilStrategy(cc
+                ac.addAction(new BrushSelector(PencilBrush.class, cc
                         .getSelectedColor()));
             }
         });
@@ -60,7 +74,10 @@ public class paint extends Activity {
         cc.setColorListener(new ColorChooserListener() {
             @Override
             public void onColorSelected(ColorChooser cc) {
-                drawingView.getStrategy().setColor(cc.getSelectedColor());
+                Brush s = drawingView.getBrush();
+                BrushSelector b = new BrushSelector(s.getClass(), cc
+                        .getSelectedColor());
+                ac.addAction(b);
             }
         });
     }

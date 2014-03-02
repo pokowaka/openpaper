@@ -1,5 +1,6 @@
-package org.openpaper.paint.drawing;
+package org.openpaper.paint.drawing.brush;
 
+import org.openpaper.paint.drawing.Point;
 import org.openpaper.paint.util.Bounds;
 
 import android.graphics.Canvas;

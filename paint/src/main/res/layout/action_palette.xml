@@ -15,13 +15,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ink" />
-   
-   <Button
+
+    <Button
         android:id="@+id/undo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="undo" />
-    
+
+    <Button
+        android:id="@+id/redo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="redo" />
+
     <org.openpaper.paint.drawing.ColorChooser
         android:id="@+id/colorChooser1"
         android:layout_width="wrap_content"

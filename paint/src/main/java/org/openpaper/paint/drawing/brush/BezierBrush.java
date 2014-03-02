@@ -1,13 +1,15 @@
-package org.openpaper.paint.drawing;
+package org.openpaper.paint.drawing.brush;
 
 import java.util.LinkedList;
 import java.util.Queue;
+
+import org.openpaper.paint.drawing.Point;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
-public class BezierDrawStrategy implements DrawStrategy {
+public class BezierBrush extends Brush {
 
     private int strokeWidth = 20;
 
@@ -22,10 +24,10 @@ public class BezierDrawStrategy implements DrawStrategy {
 
     private Queue<Point> pointQueue = new LinkedList<Point>();
 
-    public BezierDrawStrategy() {
+    public BezierBrush() {
     }
 
-    public BezierDrawStrategy(float velocity, int stroke, int color) {
+    public BezierBrush(float velocity, int stroke, int color) {
         this.velocityFilter = velocity;
         this.strokeWidth = stroke;
         init(color);
@@ -83,6 +85,7 @@ public class BezierDrawStrategy implements DrawStrategy {
 
     private Rect addBezier(Canvas canvas, Bezier curve, float startWidth,
             float endWidth) {
+        this.paint.setColor(getColor());
         curve.draw(canvas, paint, startWidth, endWidth);
 
         // Invalidate the curve, make sure the bounding box is thick enough to
@@ -101,8 +104,4 @@ public class BezierDrawStrategy implements DrawStrategy {
         this.pointQueue.clear();
     }
 
-    @Override
-    public void setColor(int color) {
-        this.paint.setColor(color);
-    }
 }

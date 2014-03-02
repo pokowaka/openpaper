@@ -1,8 +1,9 @@
-package org.openpaper.paint.drawing;
+package org.openpaper.paint.drawing.brush;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.openpaper.paint.drawing.Point;
 import org.openpaper.paint.util.Bounds;
 
 import android.graphics.Canvas;
@@ -21,16 +22,16 @@ import android.graphics.Rect;
  * @author erwinj
  * 
  */
-public class PencilStrategy implements DrawStrategy {
+public class PencilBrush extends Brush {
 
     private Queue<Point> pointQueue = new LinkedList<Point>();
     private Paint paint = new Paint();
 
-    public PencilStrategy() {
+    public PencilBrush() {
         init(Color.BLACK);
     }
 
-    public PencilStrategy(int color) {
+    public PencilBrush(int color) {
         init(color);
     }
 
@@ -66,6 +67,7 @@ public class PencilStrategy implements DrawStrategy {
     }
 
     private void drawLine(Canvas canvas, Point p0, Point p1) {
+        this.paint.setColor(getColor());
         float distance = p0.distanceTo(p1);
         final float tfinal = 2;
 
@@ -117,8 +119,4 @@ public class PencilStrategy implements DrawStrategy {
         this.pointQueue.clear();
     }
 
-    @Override
-    public void setColor(int color) {
-        this.paint.setColor(color);
-    }
 }

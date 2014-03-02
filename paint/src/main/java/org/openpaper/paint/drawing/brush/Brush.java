@@ -1,4 +1,7 @@
-package org.openpaper.paint.drawing;
+package org.openpaper.paint.drawing.brush;
+
+import org.openpaper.paint.drawing.DrawingView;
+import org.openpaper.paint.drawing.Point;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -10,7 +13,12 @@ import android.graphics.Rect;
  * @author erwinj
  * 
  */
-public interface DrawStrategy extends Cloneable {
+public abstract class Brush {
+
+    protected int color;
+
+    public Brush() {
+    }
 
     /**
      * A new point has been added to canvas. This is called during touch events.
@@ -24,9 +32,9 @@ public interface DrawStrategy extends Cloneable {
      *            coming in this segment.
      * @return The dirty rectangle.
      */
-    Rect addPoint(Canvas c, Point p);
+    public abstract Rect addPoint(Canvas c, Point p);
 
-    void clear();
+    public abstract void clear();
 
     /**
      * Sets the color that should be used by this drawing strategy.
@@ -34,6 +42,11 @@ public interface DrawStrategy extends Cloneable {
      * @param color
      *            The color to be used while drawing.
      */
-    void setColor(int color);
+    public  void setColor(int color) {
+        this.color = color;
+    }
 
+    public int getColor() {
+        return color;
+    }
 }

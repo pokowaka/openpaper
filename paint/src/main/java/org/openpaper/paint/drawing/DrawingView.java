@@ -1,16 +1,16 @@
 package org.openpaper.paint.drawing;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.Stack;
+import org.openpaper.paint.action.ActionQueue;
+import org.openpaper.paint.action.AddPointAction;
+import org.openpaper.paint.drawing.brush.Brush;
+import org.openpaper.paint.drawing.brush.PointBrush;
 
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Paint.Style;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -40,17 +40,8 @@ public class DrawingView extends View {
     private Bitmap bitmap = null;
     private Canvas bitmapCanvas = null;
 
-    private Bitmap snapshot = null;
-    private Canvas snapshotCanvas = null;
-
-    private DrawStrategy drawStrategy = new PointDrawStrategy();
-
-    
-    // Todo, need to keep track of strategy as well :-)...
-    private Stack<Point> history = new Stack<Point>();
-    private Stack<Point> redo = new Stack<Point>();
-
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private Brush brush = new PointBrush();
+    private ActionQueue actionQueue = new ActionQueue(this);
 
     public DrawingView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -58,38 +49,19 @@ public class DrawingView extends View {
 
     public void addPoint(Point newPoint) {
         if (bitmap == null) {
-            bitmap = Bitmap.createBitmap(getWidth(), getHeight(),
-                    Bitmap.Config.ARGB_8888);
-            bitmapCanvas = new Canvas(bitmap);
+            initBitmap();
         }
-
-        // Add to the undo history and notify observers
-        int size = history.size();
-        history.push(newPoint);
-        pcs.firePropertyChange("history", size, history.size());
-
-        Log.i(TAG, "Point: " + newPoint);
         // Draw an invalidate.
-        Rect dirty = drawStrategy.addPoint(bitmapCanvas, newPoint);
+        Rect dirty = brush.addPoint(bitmapCanvas, newPoint);
         if (dirty != null) {
             invalidate();
         }
     }
 
     public void clear() {
-        bitmap = Bitmap.createBitmap(getWidth(), getHeight(),
-                Bitmap.Config.ARGB_8888);
-        bitmapCanvas = new Canvas(bitmap);
-        drawStrategy.clear();
-        postInvalidate();
-    }
-
-    public int getUndoHistory() {
-        return history.size();
-    }
-
-    public int getRedoHistory() {
-        return redo.size();
+        brush.clear();
+        bitmapCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        invalidate();
     }
 
     @Override
@@ -102,8 +74,7 @@ public class DrawingView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
         case MotionEvent.ACTION_DOWN:
-            redo.clear();
-            addPoint(null);
+            actionQueue.addAction(new AddPointAction(null));
             return true;
 
         case MotionEvent.ACTION_MOVE:
@@ -117,11 +88,14 @@ public class DrawingView extends View {
                 float historicalY = event.getHistoricalY(i);
                 float pressure = event.getHistoricalPressure(i);
                 long time = event.getHistoricalEventTime(i);
-                addPoint(new Point(historicalX, historicalY, pressure, time));
+
+                actionQueue.addAction(new AddPointAction(new Point(
+                        historicalX, historicalY, pressure, time)));
             }
 
             // After replaying history, connect the line to the touch point.
-            addPoint(new Point(event.getX(), event.getY(), event.getPressure(), event.getEventTime()));
+            actionQueue.addAction(new AddPointAction(new Point(event.getX(),
+                    event.getY(), event.getPressure(), event.getEventTime())));
             break;
 
         default:
@@ -132,56 +106,28 @@ public class DrawingView extends View {
         return true;
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener pcl) {
-        this.pcs.addPropertyChangeListener(pcl);
+    public Brush getBrush() {
+        return this.brush;
     }
 
-    public void removePropertyChangeListener(PropertyChangeListener pcl) {
-        this.pcs.removePropertyChangeListener(pcl);
+    public void setBrush(Brush aBrush) {
+        this.brush = aBrush;
     }
 
-    public DrawStrategy getStrategy() {
-        return this.drawStrategy;
-    }
-
-    public void setDrawStrategy(DrawStrategy strategy) {
-        this.drawStrategy = strategy;
-    }
-
-    public void redo(int points) {
-        while (points > 0 && !redo.empty()) {
-            points--;
-            addPoint(redo.pop());
+    public Bitmap getOffscreenBuffer() {
+        if (this.bitmap == null) {
+            initBitmap();
         }
+        return this.bitmap;
     }
 
-    public void undo(int points) {
-        // TODO: We might want to make intermediate snapshots...
-        // to increase performance..
-        while (points > 0 && !history.empty()) {
-            points--;
-            redo.push(history.pop());
-            pcs.firePropertyChange("history", history.size(),
-                    history.size() - 1);
-        }
+    private void initBitmap() {
+        bitmap = Bitmap.createBitmap(getWidth(), getHeight(),
+                Bitmap.Config.ARGB_8888);
+        bitmapCanvas = new Canvas(bitmap);
+    }
 
-        // now let's repaint from the beginning of time..
-        this.clear();
-        Rect invalid = new Rect(Integer.MAX_VALUE, Integer.MAX_VALUE,
-                Integer.MIN_VALUE, Integer.MIN_VALUE);
-
-        // Now repaint from the beginning of time..
-        for (Point p : history) {
-            Rect dirty = drawStrategy.addPoint(bitmapCanvas, p);
-
-            // Extend the dirty rectangle.
-            if (dirty != null) {
-                invalid.left = Math.min(dirty.left, invalid.left);
-                invalid.right = Math.max(dirty.right, invalid.right);
-                invalid.top = Math.min(dirty.top, invalid.top);
-                invalid.bottom = Math.max(dirty.bottom, invalid.bottom);
-            }
-        }
-        postInvalidate(invalid.left, invalid.top, invalid.right, invalid.bottom);
+    public ActionQueue getActionQueue() {
+        return actionQueue;
     }
 }

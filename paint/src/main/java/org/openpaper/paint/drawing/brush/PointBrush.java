@@ -1,4 +1,6 @@
-package org.openpaper.paint.drawing;
+package org.openpaper.paint.drawing.brush;
+
+import org.openpaper.paint.drawing.Point;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -13,11 +15,11 @@ import android.graphics.RectF;
  * @author erwinj
  * 
  */
-public class PointDrawStrategy implements DrawStrategy {
+public class PointBrush extends Brush {
 
     private Paint paint = new Paint();
 
-    public PointDrawStrategy() {
+    public PointBrush() {
         paint.setAntiAlias(true);
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.STROKE);
@@ -26,7 +28,7 @@ public class PointDrawStrategy implements DrawStrategy {
         paint.setStrokeWidth(5f);
     }
 
-    public PointDrawStrategy(int color) {
+    public PointBrush(int color) {
         paint.setAntiAlias(true);
         paint.setColor(color);
         paint.setStyle(Paint.Style.STROKE);
@@ -35,7 +37,7 @@ public class PointDrawStrategy implements DrawStrategy {
         paint.setStrokeWidth(5f);
     }
 
-    public PointDrawStrategy(Paint paint) {
+    public PointBrush(Paint paint) {
         this.paint = paint;
     }
 
@@ -44,6 +46,7 @@ public class PointDrawStrategy implements DrawStrategy {
         if (p == null)
             return null;
 
+        this.paint.setColor(getColor());
         c.drawPoint(p.x, p.y, paint);
         int strokeWidth = (int) (paint.getStrokeWidth() / 2);
         return new Rect((int) p.x - strokeWidth, (int) p.y - strokeWidth,
@@ -52,10 +55,5 @@ public class PointDrawStrategy implements DrawStrategy {
 
     @Override
     public void clear() {
-    }
-
-    @Override
-    public void setColor(int color) {
-        this.paint.setColor(color);
     }
 }

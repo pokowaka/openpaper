@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.openpaper.paint.paint" >
+    tools:context="org.openpaper.paint.Paint" >
 
     <LinearLayout
         android:id="@+id/fullscreen_content_controls"
@@ -13,13 +13,10 @@
 
         <include layout="@layout/action_palette" />
 
-        <org.openpaper.paint.drawing.DrawingView
-            android:id="@+id/drawingView"
+        <org.openpaper.paint.drawing.PaperView
+            android:id="@+id/paperView"
             android:layout_width="match_parent"
-            android:layout_height="338dp"
-            android:background="#f5f4f0"
-            android:gravity="center"
-            android:keepScreenOn="true" />
+            android:layout_height="match_parent" />
     </LinearLayout>
 
 </FrameLayout>

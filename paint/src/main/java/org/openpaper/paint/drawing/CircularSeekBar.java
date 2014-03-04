@@ -1,6 +1,10 @@
 /**
+ * 
+ * https://github.com/RaghavSood/AndroidCircularSeekBar
+ * 
  * @author Raghav Sood
- * @version 1
+ * @auther ErwinJ Minor changes.
+ * @version 2
  * @date 26 January, 2013
  */
 package org.openpaper.paint.drawing;
@@ -13,8 +17,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -22,6 +28,10 @@ import android.view.View;
  * The Class CircularSeekBar.
  */
 public class CircularSeekBar extends View {
+
+    private static final String REWIND = "Rewind";
+
+    private static final String TAG = "org.openpaper.paint.drawing.CircularSeekBar";
 
     /** The context */
     private Context mContext;
@@ -58,9 +68,6 @@ public class CircularSeekBar extends View {
 
     /** The current progress */
     private int progress;
-
-    /** The progress percent */
-    private int progressPercent;
 
     /** The radius of the inner circle */
     private float innerRadius;
@@ -113,7 +120,7 @@ public class CircularSeekBar extends View {
     /**
      * The adjustment factor. This adds an adjustment of the specified size to
      * both sides of the progress bar, allowing touch events to be processed
-     * more user friendlily (yes, I know that's not a word)
+     * more realistically
      */
     private float adjustmentFactor = 100;
 
@@ -126,14 +133,18 @@ public class CircularSeekBar extends View {
     /** The flag to see if view is pressed */
     private boolean IS_PRESSED = false;
 
-    /**
-     * The flag to see if the setProgress() method was called from our own
-     * View's setAngle() method, or externally by a user.
-     */
-    private boolean CALLED_FROM_ANGLE = false;
-
     /** The rectangle containing our circles and arcs. */
     private RectF rect = new RectF();
+
+    private float xold;
+
+    private float yold;
+
+    private double degold;
+
+    private Paint textPaint;
+
+    private Rect textBounds = new Rect();
 
     {
         mListener = new OnSeekChangeListener() {
@@ -147,6 +158,7 @@ public class CircularSeekBar extends View {
         circleColor = new Paint();
         innerColor = new Paint();
         circleRing = new Paint();
+        textPaint = new Paint(Paint.LINEAR_TEXT_FLAG);
 
         circleColor.setColor(Color.parseColor("#ff33b5e5")); // Set default
                                                              // progress
@@ -155,14 +167,21 @@ public class CircularSeekBar extends View {
         innerColor.setColor(Color.BLACK); // Set default background color to
                                           // black
         circleRing.setColor(Color.GRAY);// Set default background color to Gray
+        textPaint.setColor(Color.BLACK);
 
         circleColor.setAntiAlias(true);
+        textPaint.setAntiAlias(true);
         innerColor.setAntiAlias(true);
         circleRing.setAntiAlias(true);
+
+        circleColor.setAlpha(0x80);
+        circleRing.setAlpha(0x80);
 
         circleColor.setStrokeWidth(5);
         innerColor.setStrokeWidth(5);
         circleRing.setStrokeWidth(5);
+
+        // innerColor.setAlpha(0x80);
 
         circleColor.setStyle(Paint.Style.FILL);
     }
@@ -252,6 +271,9 @@ public class CircularSeekBar extends View {
         markPointX = startPointX;// Initial locatino of the marker X coordinate
         markPointY = startPointY;// Initial locatino of the marker Y coordinate
 
+        textPaint.setTextSize(innerRadius / 3);
+        textPaint.getTextBounds(REWIND, 0, REWIND.length(), textBounds);
+
         rect.set(left, top, right, bottom); // assign size to rect
     }
 
@@ -267,8 +289,10 @@ public class CircularSeekBar extends View {
 
         canvas.drawCircle(cx, cy, outerRadius, circleRing);
         canvas.drawArc(rect, startAngle, angle, true, circleColor);
-        canvas.drawCircle(cx, cy, innerRadius, innerColor);
-        drawMarkerAtProgress(canvas);
+        // canvas.drawCircle(cx, cy, innerRadius, innerColor);
+        canvas.drawText(REWIND, cx - textBounds.width() / 2,
+                cy + textBounds.height() / 2, textPaint);
+        // drawMarkerAtProgress(canvas);
 
         super.onDraw(canvas);
     }
@@ -330,13 +354,11 @@ public class CircularSeekBar extends View {
      * @param angle
      *            the new angle
      */
-    public void setAngle(int angle) {
-        this.angle = angle;
+    private void setAngle(int angle) {
+        this.angle = Math.abs(angle % 360);
         float donePercent = (((float) this.angle) / 360) * 100;
         float progress = (donePercent / 100) * getMaxProgress();
-        setProgressPercent(Math.round(donePercent));
-        CALLED_FROM_ANGLE = true;
-        setProgress(Math.round(progress));
+        setInternalProgress(Math.round(progress));
     }
 
     /**
@@ -418,6 +440,9 @@ public class CircularSeekBar extends View {
      */
     public void setMaxProgress(int maxProgress) {
         this.maxProgress = maxProgress;
+
+        if (this.getVisibility() != View.VISIBLE)
+            this.degold = 0;
     }
 
     /**
@@ -429,6 +454,13 @@ public class CircularSeekBar extends View {
         return progress;
     }
 
+    private void setInternalProgress(int progress) {
+        if (this.progress != progress) {
+            this.progress = progress;
+            mListener.onProgressChange(this, this.getProgress());
+        }
+    }
+
     /**
      * Sets the progress.
      * 
@@ -436,36 +468,16 @@ public class CircularSeekBar extends View {
      *            the new progress
      */
     public void setProgress(int progress) {
+        if (progress < 0 || progress > this.maxProgress)
+            return;
+
         if (this.progress != progress) {
             this.progress = progress;
-            if (!CALLED_FROM_ANGLE) {
-                int newPercent = (this.progress / this.maxProgress) * 100;
-                int newAngle = (newPercent / 100) * 360;
-                this.setAngle(newAngle);
-                this.setProgressPercent(newPercent);
-            }
+            float newPercent = (((float) this.progress / (float) this.maxProgress) * 100f);
+            this.angle = (int) ((newPercent / 100) * 360);
             mListener.onProgressChange(this, this.getProgress());
-            CALLED_FROM_ANGLE = false;
+            invalidate();
         }
-    }
-
-    /**
-     * Gets the progress percent.
-     * 
-     * @return the progress percent
-     */
-    public int getProgressPercent() {
-        return progressPercent;
-    }
-
-    /**
-     * Sets the progress percent.
-     * 
-     * @param progressPercent
-     *            the new progress percent
-     */
-    public void setProgressPercent(int progressPercent) {
-        this.progressPercent = progressPercent;
     }
 
     /**
@@ -507,59 +519,29 @@ public class CircularSeekBar extends View {
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
-        boolean up = false;
         switch (event.getAction()) {
         case MotionEvent.ACTION_DOWN:
-            moved(x, y, up);
+            degold = Math
+                    .atan2(y - cy - this.getTop(), x - cx - this.getLeft())
+                    + Math.PI;
             break;
         case MotionEvent.ACTION_MOVE:
-            moved(x, y, up);
-            break;
-        case MotionEvent.ACTION_UP:
-            up = true;
-            moved(x, y, up);
+            double degree = Math.atan2(y - cy - this.getTop(),
+                    x - cx - this.getLeft())
+                    + Math.PI;
+            if (degree < degold && angle > 0) {
+                // We moved left
+                setProgress(getProgress() - 1);
+            }
+            if (degree > degold && angle < 360) {
+                setProgress(getProgress() + 1);
+            }
+
+            degold = degree;
+            this.invalidate();
             break;
         }
         return true;
-    }
-
-    /**
-     * Moved.
-     * 
-     * @param x
-     *            the x
-     * @param y
-     *            the y
-     * @param up
-     *            the up
-     */
-    private void moved(float x, float y, boolean up) {
-        float distance = (float) Math.sqrt(Math.pow((x - cx), 2)
-                + Math.pow((y - cy), 2));
-        if (distance < outerRadius + adjustmentFactor
-                && distance > innerRadius - adjustmentFactor && !up) {
-            IS_PRESSED = true;
-
-            markPointX = (float) (cx + outerRadius
-                    * Math.cos(Math.atan2(x - cx, cy - y) - (Math.PI / 2)));
-            markPointY = (float) (cy + outerRadius
-                    * Math.sin(Math.atan2(x - cx, cy - y) - (Math.PI / 2)));
-
-            float degrees = (float) ((float) ((Math.toDegrees(Math.atan2(
-                    x - cx, cy - y)) + 360.0)) % 360.0);
-            // and to make it count 0-360
-            if (degrees < 0) {
-                degrees += 2 * Math.PI;
-            }
-
-            setAngle(Math.round(degrees));
-            invalidate();
-
-        } else {
-            IS_PRESSED = false;
-            invalidate();
-        }
-
     }
 
     /**

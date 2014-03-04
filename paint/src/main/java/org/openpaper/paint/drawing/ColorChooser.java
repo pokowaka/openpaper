@@ -48,7 +48,7 @@ public class ColorChooser extends LinearLayout {
         drawable.setColor(aColor);
         // I know this doesn't make sense.. not setting the stroke results
         // in weirdness.
-        drawable.setStroke(10, aColor);
+        drawable.setStroke(strokeWidth, aColor);
 
         colorSet.put(aColor, drawable);
 
@@ -66,22 +66,18 @@ public class ColorChooser extends LinearLayout {
     }
 
     void initialize() {
-
         // Load up the default colors..
         colors = new int[DEFAULT_PALETTE.length];
         for (int i = 0; i < DEFAULT_PALETTE.length; i++) {
             colors[i] = Color.parseColor(DEFAULT_PALETTE[i]);
         }
 
+        LinearLayout.LayoutParams lllp = new LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
         for (int i = 0; i < colors.length; i++) {
-
             ImageButton btn = addColorButton(colors[i]);
-            // final LinearLayout.LayoutParams lp = new
-            // LinearLayout.LayoutParams(
-            // size, size);
-            // lp.setMargins(20, 20, 20, 20);
-            // btn.setLayoutParams(lp);
-            addView(btn);
+            addView(btn, lllp);
         }
 
         onColorSelected(colors[0]);
@@ -103,7 +99,6 @@ public class ColorChooser extends LinearLayout {
         colorSet.get(color).setStroke(strokeWidth, Color.parseColor("#878787"));
     }
 
-    
     public int getSelectedColor() {
         return current;
     }

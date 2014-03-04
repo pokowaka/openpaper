@@ -5,43 +5,38 @@ import org.openpaper.paint.action.AddPointAction;
 import org.openpaper.paint.drawing.brush.Brush;
 import org.openpaper.paint.drawing.brush.PointBrush;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 /**
- * A DrawingView is a view that tracks touch events. The touch events are
- * dispatched to a drawing strategy that is responsible for drawing these points
- * on the canvas.
- * 
- * The canvas is an offscreen buffer, so the draw strategy doesn't have to
- * implement repaints etc.
- * 
- * It also contains an undo buffer, so that users can undo a series of
- * operations. Undo's work by replaying the addition of points from the last
- * time a snapshot has been made.
+ * A DrawingView is a view that tracks touch events.
  * 
  * @author erwinj
  * 
  */
-@TargetApi(Build.VERSION_CODES.CUPCAKE)
 public class DrawingView extends View {
-    private static final String TAG = "com.rwin.randy.ui.SignatureView";
+    private static final String TAG = "org.openpaper.paint.drawing.DrawingView";
 
     private Bitmap bitmap = null;
     private Canvas bitmapCanvas = null;
-
     private Brush brush = new PointBrush();
     private ActionQueue actionQueue = new ActionQueue(this);
+
+    public DrawingView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+
+    public DrawingView(Context context) {
+        super(context);
+    }
 
     public DrawingView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -60,7 +55,8 @@ public class DrawingView extends View {
 
     public void clear() {
         brush.clear();
-        bitmapCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        if (bitmapCanvas != null)
+            bitmapCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         invalidate();
     }
 
@@ -72,6 +68,7 @@ public class DrawingView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
         switch (event.getAction()) {
         case MotionEvent.ACTION_DOWN:
             actionQueue.addAction(new AddPointAction(null));
@@ -89,8 +86,8 @@ public class DrawingView extends View {
                 float pressure = event.getHistoricalPressure(i);
                 long time = event.getHistoricalEventTime(i);
 
-                actionQueue.addAction(new AddPointAction(new Point(
-                        historicalX, historicalY, pressure, time)));
+                actionQueue.addAction(new AddPointAction(new Point(historicalX,
+                        historicalY, pressure, time)));
             }
 
             // After replaying history, connect the line to the touch point.

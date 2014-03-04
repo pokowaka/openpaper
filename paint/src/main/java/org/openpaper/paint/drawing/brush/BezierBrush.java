@@ -15,7 +15,7 @@ public class BezierBrush extends Brush {
 
     private float velocityFilter = 0.2f;
 
-    private Paint paint = new Paint();
+    private Paint paint = new Paint(Paint.DITHER_FLAG);
 
     private Point lastPoint;
 
@@ -36,6 +36,8 @@ public class BezierBrush extends Brush {
     private void init(int color) {
         paint.setAntiAlias(true);
         paint.setColor(color);
+        paint.setAlpha(0x80);
+        paint.setDither(true);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeJoin(Paint.Join.ROUND);
         paint.setStrokeCap(Paint.Cap.ROUND);
@@ -52,11 +54,17 @@ public class BezierBrush extends Brush {
         }
 
         this.pointQueue.offer(newPoint);
-        int velocity = (int) newPoint.velocityFrom(lastPoint);
+        float velocity = lastVelocity;
 
-        // A simple lowpass filter to mitigate velocity aberrations.
-        velocity = (int) (velocityFilter * velocity + (1 - velocityFilter)
-                * lastVelocity);
+        // velocity can be 0 in case of very fast movements..
+        if (newPoint.velocityFrom(lastPoint) > 0) {
+            velocity = newPoint.velocityFrom(lastPoint);
+            // A simple lowpass filter to mitigate velocity aberrations.
+            velocity = (velocityFilter * velocity + (1 - velocityFilter)
+                    * lastVelocity);
+        } else {
+
+        }
 
         float newWidth = strokeWidth - velocity;
 
@@ -85,6 +93,8 @@ public class BezierBrush extends Brush {
 
     private Rect addBezier(Canvas canvas, Bezier curve, float startWidth,
             float endWidth) {
+        
+
         this.paint.setColor(getColor());
         curve.draw(canvas, paint, startWidth, endWidth);
 

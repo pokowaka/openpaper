@@ -24,6 +24,8 @@ import android.graphics.Rect;
  */
 public class PencilBrush extends Brush {
 
+    final int displacement = 0;
+
     private Queue<Point> pointQueue = new LinkedList<Point>();
     private Paint paint = new Paint();
 
@@ -90,8 +92,8 @@ public class PencilBrush extends Brush {
             float m = (15 * tau * tau * tau * tau)
                     - (6 * tau * tau * tau * tau * tau)
                     - (10 * tau * tau * tau);
-            float x = p0.x + (p0.x - p1.x) * m;
-            float y = p0.y + (p0.y - p1.y) * m;
+            float x = p0.x + (p0.x - p1.x) * m + displacement;
+            float y = p0.y + (p0.y - p1.y) * m + displacement;
 
             // Which we use to construct bezier curves.
             pts.offer(new Point(x, y));

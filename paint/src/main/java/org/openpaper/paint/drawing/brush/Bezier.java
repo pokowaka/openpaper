@@ -6,7 +6,6 @@ import org.openpaper.paint.util.Bounds;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.util.Log;
 
 public class Bezier {
 
@@ -36,7 +35,7 @@ public class Bezier {
         this.bb = new Rect(Integer.MAX_VALUE, Integer.MAX_VALUE,
                 Integer.MIN_VALUE, Integer.MIN_VALUE);
 
-        final int APPROX = 128;
+        final int APPROX = 8;
         for (int i = 0; i < APPROX; i++) {
             Bounds.extendRect(calculatePoint(i / APPROX), bb);
         }
@@ -47,9 +46,7 @@ public class Bezier {
         Bounds.extendRect(p3, bb);
 
         // Poor approximation of how many points we will draw...
-        float dx = bb.right - bb.left;
-        float dy = bb.bottom - bb.top;
-        drawSteps = (int) (2 * Math.sqrt(dx * dx + dy * dy));
+        drawSteps = (int) (p0.distanceTo(p1) + p1.distanceTo(p2) + p2.distanceTo(p3));
     }
 
     public Point calculatePoint(float t) {

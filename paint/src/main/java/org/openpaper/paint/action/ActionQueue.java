@@ -6,7 +6,7 @@ import org.openpaper.paint.drawing.DrawingView;
 
 /**
  * @author erwinj
- *
+ * 
  */
 public class ActionQueue {
 
@@ -15,6 +15,13 @@ public class ActionQueue {
     private static final int SNAPSHOT_INTERVAL = 100;
 
     private static final int MAX_UNDO = 20 * SNAPSHOT_INTERVAL;
+
+    private ActionQueueChangeListener listener;
+
+    public interface ActionQueueChangeListener {
+
+        void historyChanged(ActionQueue actionQueue, int undo, int redo);
+    }
 
     // Important! We have the following invariant..
     // First element on the undo stack is always a snapshot action.
@@ -47,6 +54,8 @@ public class ActionQueue {
 
         pa.execute(dv);
         undo.push(pa);
+
+        notifyListener();
     }
 
     public void redo(int steps) {
@@ -56,6 +65,8 @@ public class ActionQueue {
             pa.execute(dv);
             undo.push(pa);
         }
+
+        notifyListener();
     }
 
     public void undo(int steps) {
@@ -86,8 +97,12 @@ public class ActionQueue {
         forward--;
 
         for (; forward > 0; forward--) {
-            redo.pop().execute(dv);
+            action = redo.pop();
+            action.execute(dv);
+            undo.push(action);
         }
+
+        notifyListener();
     }
 
     public int getUndoHistory() {
@@ -97,4 +112,20 @@ public class ActionQueue {
     public int getRedoHistory() {
         return redo.size();
     }
+
+    void notifyListener() {
+        if (listener != null)
+            listener.historyChanged(this, undo.size(), redo.size());
+    }
+
+    public void setActionQueueChangeListener(ActionQueueChangeListener listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public String toString() {
+        return "ActionQueue [undo=" + undo.size() + ", redo=" + redo.size()
+                + "]";
+    }
+
 }

@@ -9,24 +9,10 @@ import android.graphics.RectF;
  * 
  */
 public class Point {
+    private float pressure;
+    public long time;
     public final float x;
     public final float y;
-    public long time;
-    private float pressure;
-
-    public float distanceTo(Point other) {
-        if (other == null)
-            return 0;
-        float dx = other.x - x;
-        float dy = other.y - y;
-        return (float) Math.sqrt((dx * dx) + (dy * dy));
-    }
-
-    public float velocityFrom(Point start) {
-        if (start == null || this.time == start.time)
-            return 0;
-        return distanceTo(start) / (this.time - start.time);
-    }
 
     public Point(float x, float y) {
         this(x, y, 0, 0);
@@ -44,6 +30,18 @@ public class Point {
         this.pressure = pressure;
     }
 
+    public float distanceTo(Point other) {
+        if (other == null)
+            return 0;
+        float dx = other.x - x;
+        float dy = other.y - y;
+        return (float) Math.sqrt((dx * dx) + (dy * dy));
+    }
+
+    public float dotProduct(Point other) {
+        return x * other.x + y * other.y;
+    }
+
     public float getPressure() {
         return pressure;
     }
@@ -52,6 +50,12 @@ public class Point {
     public String toString() {
         return "Point [x=" + x + ", y=" + y + ", time=" + time + ", pressure="
                 + pressure + "]";
+    }
+
+    public float velocityFrom(Point start) {
+        if (start == null || this.time == start.time)
+            return 0;
+        return distanceTo(start) / (this.time - start.time);
     }
 
 }

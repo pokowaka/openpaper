@@ -48,4 +48,12 @@ public class Bounds {
                 Integer.MIN_VALUE, Integer.MIN_VALUE);
         return extendRect(b, extendRect(a, r));
     }
+
+    public static Rect extendRect(Rect orig, Rect toExtend) {
+        if (toExtend != null) {
+            extendRect(new Point(toExtend.left, toExtend.top), orig);
+            extendRect(new Point(toExtend.right, toExtend.bottom), orig);
+        }
+        return orig;
+    }
 }

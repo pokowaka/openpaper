@@ -121,4 +121,9 @@ public class PencilBrush extends Brush {
         this.pointQueue.clear();
     }
 
+    @Override
+    public String getName() {
+        return "Pencil";
+    }
+
 }

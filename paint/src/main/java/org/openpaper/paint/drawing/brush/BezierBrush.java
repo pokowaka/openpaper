@@ -38,10 +38,10 @@ public class BezierBrush extends Brush {
         paint.setColor(color);
         paint.setAlpha(0x80);
         paint.setDither(true);
-        paint.setStyle(Paint.Style.STROKE);
+        paint.setStyle(Paint.Style.FILL);
         paint.setStrokeJoin(Paint.Join.ROUND);
         paint.setStrokeCap(Paint.Cap.ROUND);
-        paint.setStrokeWidth(strokeWidth);
+        paint.setStrokeWidth(1);
     }
 
     @Override
@@ -93,7 +93,6 @@ public class BezierBrush extends Brush {
 
     private Rect addBezier(Canvas canvas, Bezier curve, float startWidth,
             float endWidth) {
-        
 
         this.paint.setColor(getColor());
         curve.draw(canvas, paint, startWidth, endWidth);
@@ -112,6 +111,11 @@ public class BezierBrush extends Brush {
     @Override
     public void clear() {
         this.pointQueue.clear();
+    }
+
+    @Override
+    public String getName() {
+        return "Bezier";
     }
 
 }

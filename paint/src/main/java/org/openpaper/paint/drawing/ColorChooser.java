@@ -107,4 +107,15 @@ public class ColorChooser extends LinearLayout {
         this.listener = listener;
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        for (int i = 0; i < this.getChildCount(); i++) {
+            View v = getChildAt(i);
+            //strokeWidth = heightMeasureSpec / 20;
+            v.setPadding(2,2,2,2);
+            v.measure(heightMeasureSpec, heightMeasureSpec);
+        }
+    }
+
 }

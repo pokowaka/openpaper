@@ -56,4 +56,9 @@ public class PointBrush extends Brush {
     @Override
     public void clear() {
     }
+
+    @Override
+    public String getName() {
+        return "Point";
+    }
 }

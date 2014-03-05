@@ -42,11 +42,16 @@ public abstract class Brush {
      * @param color
      *            The color to be used while drawing.
      */
-    public  void setColor(int color) {
+    public void setColor(int color) {
         this.color = color;
     }
 
     public int getColor() {
         return color;
     }
+
+    /**
+     * @return A user friendly name that can be used in a UI.
+     */
+    public abstract String getName();
 }

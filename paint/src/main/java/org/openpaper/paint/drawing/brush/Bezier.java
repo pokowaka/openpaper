@@ -46,7 +46,8 @@ public class Bezier {
         Bounds.extendRect(p3, bb);
 
         // Poor approximation of how many points we will draw...
-        drawSteps = (int) (p0.distanceTo(p1) + p1.distanceTo(p2) + p2.distanceTo(p3));
+        drawSteps = (int) (p0.distanceTo(p1) + p1.distanceTo(p2) + p2
+                .distanceTo(p3));
     }
 
     public Point calculatePoint(float t) {
@@ -72,7 +73,6 @@ public class Bezier {
     /** Draws a variable-width Bezier curve. */
     public void draw(Canvas canvas, Paint paint, float startWidth,
             float endWidth) {
-        float originalWidth = paint.getStrokeWidth();
         float widthDelta = (endWidth - startWidth) / drawSteps;
 
         for (int i = 0; i < drawSteps; i++) {
@@ -81,10 +81,10 @@ public class Bezier {
             Point pt = calculatePoint(t);
 
             // Set the incremental stroke width and draw.
-            paint.setStrokeWidth(startWidth + t * widthDelta);
-            canvas.drawPoint(pt.x, pt.y, paint);
-
+            float radius = startWidth + i * widthDelta;
+            if (radius > 0) {
+                canvas.drawCircle(pt.x, pt.y, radius, paint);
+            }
         }
-        paint.setStrokeWidth(originalWidth);
     }
 }

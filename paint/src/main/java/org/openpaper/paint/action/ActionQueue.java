@@ -2,6 +2,7 @@ package org.openpaper.paint.action;
 
 import java.util.LinkedList;
 
+import org.openpaper.paint.BuildConfig;
 import org.openpaper.paint.drawing.DrawingView;
 
 /**
@@ -12,8 +13,9 @@ public class ActionQueue {
 
     private static final String TAG = "org.openpaper.paint.action.ActionQueue";
 
-    private static final int SNAPSHOT_INTERVAL = 100;
+    private static final int SNAPSHOT_INTERVAL = 10;
 
+    // This ALWAYS needs to be bigger than the snapshot_interval
     private static final int MAX_UNDO = 20 * SNAPSHOT_INTERVAL;
 
     private ActionQueueChangeListener listener;
@@ -51,8 +53,6 @@ public class ActionQueue {
 
         // Well, a new action is added on the undo stack.. Kill the redo stack!
         redo.clear();
-
-        pa.execute(dv);
         undo.push(pa);
 
         notifyListener();
@@ -69,7 +69,17 @@ public class ActionQueue {
         notifyListener();
     }
 
+    public void redo() {
+        redo(1);
+    }
+
+    public void undo() {
+        undo(1);
+    }
+
     public void undo(int steps) {
+        int inv = Math.max(undo.size() - steps, 0);
+
         // Note, invariant says the first element is a snapshot!
         while (steps > 0 && undo.size() > 1) {
             steps--;
@@ -102,11 +112,15 @@ public class ActionQueue {
             undo.push(action);
         }
 
+        if (BuildConfig.DEBUG && !(undo.size() == inv)) {
+            throw new AssertionError();
+        }
+
         notifyListener();
     }
 
     public int getUndoHistory() {
-        return undo.size();
+        return undo.size() - 1;
     }
 
     public int getRedoHistory() {
@@ -126,6 +140,11 @@ public class ActionQueue {
     public String toString() {
         return "ActionQueue [undo=" + undo.size() + ", redo=" + redo.size()
                 + "]";
+    }
+
+    public void execute(PaintAction pa) {
+        pa.execute(dv);
+        addAction(pa);
     }
 
 }

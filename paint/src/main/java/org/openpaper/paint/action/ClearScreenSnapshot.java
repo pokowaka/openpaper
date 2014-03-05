@@ -4,10 +4,10 @@ import org.openpaper.paint.drawing.DrawingView;
 
 public class ClearScreenSnapshot extends PaintAction {
 
-    private BrushSelector brush;
+    private BrushStroke brush;
 
     public ClearScreenSnapshot(DrawingView dv) {
-        brush = new BrushSelector(dv.getBrush().getClass(), dv.getBrush()
+        brush = new BrushStroke(dv.getBrush().getClass(), dv.getBrush()
                 .getColor());
     }
 

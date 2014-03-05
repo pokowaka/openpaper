@@ -16,6 +16,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -358,7 +359,7 @@ public class CircularSeekBar extends View {
             this.progress = progress;
             float newPercent = (((float) this.progress / (float) this.maxProgress) * 100f);
             this.angle = (int) ((newPercent / 100) * ANGLE_AT_100PERCENT);
-            mListener.onProgressChange(this, this.getProgress());
+            mListener.onProgressChange(this, this.progress);
             invalidate();
         }
     }
@@ -402,12 +403,12 @@ public class CircularSeekBar extends View {
             double degree = Math.atan2(y - cy - this.getTop(),
                     x - cx - this.getLeft())
                     + Math.PI;
-            if (degree < degold && angle > 0) {
+            if (degree < degold && progress > 0) {
                 // We moved left
-                setAngle(this.angle - 1);
+                setProgress(progress - 1);
             }
-            if (degree > degold && angle < ANGLE_AT_100PERCENT) {
-                setAngle(this.angle + 1);
+            if (degree > degold && progress < maxProgress) {
+                setProgress(progress + 1);
             }
 
             degold = degree;

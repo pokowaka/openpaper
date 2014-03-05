@@ -3,25 +3,25 @@ package org.openpaper.paint.action;
 import org.openpaper.paint.drawing.DrawingView;
 import org.openpaper.paint.drawing.brush.Brush;
 
-public class BrushSelector extends PaintAction {
+public class BrushStroke extends PaintAction {
 
-    Brush ds;
+    Brush brush;
 
-    public BrushSelector(Class<?> clz, int color) {
+    public BrushStroke(Class<?> clz, int color) {
         if (!Brush.class.isAssignableFrom(clz)) {
-            throw new IllegalArgumentException("Clz is not a DrawStrategy!");
+            throw new IllegalArgumentException("Clz is not a Brush!");
         }
         try {
-            ds = (Brush) clz.newInstance();
-            ds.setColor(color);
+            brush = (Brush) clz.newInstance();
+            brush.setColor(color);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Clz is not a DrawStrategy!");
+            throw new IllegalArgumentException("Clz is not a Brush!");
         }
     }
 
     @Override
     void execute(DrawingView dv) {
-        dv.setBrush(ds);
+        dv.setBrush(brush);
     }
     
     @Override

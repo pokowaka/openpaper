@@ -1,9 +1,10 @@
 package org.openpaper.paint.drawing;
 
 import org.openpaper.paint.action.ActionQueue;
-import org.openpaper.paint.action.AddPointAction;
+import org.openpaper.paint.action.StrokeAction;
 import org.openpaper.paint.drawing.brush.Brush;
 import org.openpaper.paint.drawing.brush.PointBrush;
+import org.openpaper.paint.drawing.brush.Stroke;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -28,6 +29,7 @@ public class DrawingView extends View {
     private Bitmap bitmap = null;
     private Canvas bitmapCanvas = null;
     private Brush brush = new PointBrush();
+    Stroke stroke = new Stroke();
     private ActionQueue actionQueue = new ActionQueue(this);
 
     public DrawingView(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -71,7 +73,8 @@ public class DrawingView extends View {
 
         switch (event.getAction()) {
         case MotionEvent.ACTION_DOWN:
-            actionQueue.addAction(new AddPointAction(null));
+            stroke = new Stroke();
+            addPoint(null);
             return true;
 
         case MotionEvent.ACTION_MOVE:
@@ -86,13 +89,21 @@ public class DrawingView extends View {
                 float pressure = event.getHistoricalPressure(i);
                 long time = event.getHistoricalEventTime(i);
 
-                actionQueue.addAction(new AddPointAction(new Point(historicalX,
-                        historicalY, pressure, time)));
+                Point newPoint = new Point(historicalX, historicalY, pressure,
+                        time);
+                stroke.add(newPoint);
+                addPoint(newPoint);
             }
 
             // After replaying history, connect the line to the touch point.
-            actionQueue.addAction(new AddPointAction(new Point(event.getX(),
-                    event.getY(), event.getPressure(), event.getEventTime())));
+            Point newPoint = new Point(event.getX(), event.getY(),
+                    event.getPressure(), event.getEventTime());
+            stroke.add(newPoint);
+            addPoint(newPoint);
+
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                this.actionQueue.addAction(new StrokeAction(stroke));
+            }
             break;
 
         default:
@@ -126,5 +137,9 @@ public class DrawingView extends View {
 
     public ActionQueue getActionQueue() {
         return actionQueue;
+    }
+
+    public Canvas getCanvas() {
+        return bitmapCanvas;
     }
 }

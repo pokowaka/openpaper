@@ -3,7 +3,7 @@ package org.openpaper.paint;
 import java.util.ServiceLoader;
 
 import org.openpaper.paint.action.ActionQueue;
-import org.openpaper.paint.action.BrushSelector;
+import org.openpaper.paint.action.BrushStroke;
 import org.openpaper.paint.drawing.ColorChooser;
 import org.openpaper.paint.drawing.ColorChooser.ColorChooserListener;
 import org.openpaper.paint.drawing.DrawingView;
@@ -51,7 +51,7 @@ public class Paint extends Activity {
 
                 @Override
                 public void onClick(View v) {
-                    ac.addAction(new BrushSelector(brush, cc.getSelectedColor()));
+                    ac.execute(new BrushStroke(brush, cc.getSelectedColor()));
                 }
             });
             brushButton.setLayoutParams(lllp);
@@ -75,9 +75,9 @@ public class Paint extends Activity {
             @Override
             public void onColorSelected(ColorChooser cc) {
                 Brush s = paperView.getBrush();
-                BrushSelector b = new BrushSelector(s.getClass(), cc
+                BrushStroke b = new BrushStroke(s.getClass(), cc
                         .getSelectedColor());
-                ac.addAction(b);
+                ac.execute(b);
             }
         });
     }

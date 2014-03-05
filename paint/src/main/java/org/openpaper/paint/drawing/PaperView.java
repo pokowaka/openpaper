@@ -1,7 +1,6 @@
 package org.openpaper.paint.drawing;
 
 import org.openpaper.paint.action.ActionQueue;
-import org.openpaper.paint.action.ActionQueue.ActionQueueChangeListener;
 import org.openpaper.paint.drawing.CircularSeekBar.OnSeekChangeListener;
 import org.openpaper.paint.drawing.brush.Brush;
 
@@ -80,16 +79,14 @@ public class PaperView extends FrameLayout {
                 int undo = aq.getUndoHistory();
                 int redo = aq.getRedoHistory();
 
-                Log.i(TAG, "Progress change: " + newProgress + ", undo: "
-                        + undo + ", redo: " + redo);
-                // Nothing is happening.
-                if (newProgress == undo || newProgress >= undo + redo)
+                // Nothing is happening, or we are out of range.
+                if (newProgress == undo || newProgress > undo + redo)
                     return;
 
                 if (newProgress < undo) {
                     aq.undo(undo - newProgress);
                 } else {
-                    aq.redo(newProgress - undo);
+                    aq.redo(Math.abs(newProgress - undo));
                 }
             }
         });
@@ -107,7 +104,8 @@ public class PaperView extends FrameLayout {
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (event.getPointerCount() == 2) {
             if (csb.getVisibility() != View.VISIBLE) {
-                int maxProgress = getActionQueue().getRedoHistory() + getActionQueue().getUndoHistory();
+                int maxProgress = getActionQueue().getRedoHistory()
+                        + getActionQueue().getUndoHistory();
                 csb.setMaxProgress(maxProgress);
                 csb.setProgress(maxProgress);
                 csb.setVisibility(View.VISIBLE);

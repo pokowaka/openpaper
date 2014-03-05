@@ -26,7 +26,6 @@ public class PencilBrush extends Brush {
 
     final int displacement = 0;
 
-    private Queue<Point> pointQueue = new LinkedList<Point>();
     private Paint paint = new Paint();
 
     public PencilBrush() {

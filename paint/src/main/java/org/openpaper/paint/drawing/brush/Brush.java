@@ -1,7 +1,11 @@
 package org.openpaper.paint.drawing.brush;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import org.openpaper.paint.drawing.DrawingView;
 import org.openpaper.paint.drawing.Point;
+import org.openpaper.paint.util.Bounds;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -16,6 +20,8 @@ import android.graphics.Rect;
 public abstract class Brush {
 
     protected int color;
+
+    protected Queue<Point> pointQueue = new LinkedList<Point>();
 
     public Brush() {
     }
@@ -33,6 +39,24 @@ public abstract class Brush {
      * @return The dirty rectangle.
      */
     public abstract Rect addPoint(Canvas c, Point p);
+
+    public Rect drawStroke(Canvas c, Stroke s) {
+        Rect r = null;
+        this.clear();
+        for (Point p : s) {
+            Rect f = addPoint(c, p);
+            if (f != null) {
+                if (r == null) {
+                    r = f;
+                } else {
+                    r = Bounds.extendRect(r, f);
+                }
+            }
+        }
+        addPoint(c, null);
+
+        return r;
+    }
 
     public abstract void clear();
 

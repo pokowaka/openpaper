@@ -16,13 +16,13 @@ import android.graphics.PorterDuff;
 public class SnapshotAction extends PaintAction {
 
     private Bitmap snapshot;
-    private BrushSelector brush;
+    private BrushStroke brush;
 
     public SnapshotAction(DrawingView dv) {
         Bitmap bitmap = dv.getOffscreenBuffer();
         snapshot = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
                 bitmap.getHeight(), null, true);
-        brush = new BrushSelector(dv.getBrush().getClass(), dv.getBrush()
+        brush = new BrushStroke(dv.getBrush().getClass(), dv.getBrush()
                 .getColor());
     }
 

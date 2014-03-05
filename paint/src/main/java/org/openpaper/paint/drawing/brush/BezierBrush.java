@@ -22,7 +22,6 @@ public class BezierBrush extends Brush {
     private float lastVelocity;
     private float lastWidth;
 
-    private Queue<Point> pointQueue = new LinkedList<Point>();
 
     public BezierBrush() {
     }
@@ -111,6 +110,9 @@ public class BezierBrush extends Brush {
     @Override
     public void clear() {
         this.pointQueue.clear();
+        this.lastPoint = null;
+        this.lastVelocity = 0;
+        this.lastWidth = 0;
     }
 
     @Override

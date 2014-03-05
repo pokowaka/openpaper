@@ -5,9 +5,9 @@ import org.openpaper.paint.drawing.CircularSeekBar.OnSeekChangeListener;
 import org.openpaper.paint.drawing.brush.Brush;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,6 +26,8 @@ public class PaperView extends FrameLayout {
 
     private DrawingView dv;
     private CircularSeekBar csb;
+
+    private boolean undo;
 
     public PaperView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -100,6 +102,10 @@ public class PaperView extends FrameLayout {
         return dv.getBrush();
     }
 
+    public Bitmap getBitmap() {
+        return dv.getBitmap();
+    }
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (event.getPointerCount() == 2) {
@@ -107,14 +113,25 @@ public class PaperView extends FrameLayout {
                 int maxProgress = getActionQueue().getRedoHistory()
                         + getActionQueue().getUndoHistory();
                 csb.setMaxProgress(maxProgress);
-                csb.setProgress(maxProgress);
+                csb.setProgress(getActionQueue().getUndoHistory());
                 csb.setVisibility(View.VISIBLE);
+                undo = true;
             }
 
             return csb.onTouchEvent(event);
         }
 
         csb.setVisibility(View.INVISIBLE);
+        // Okay, we need to ignore all the up events that came after doing an
+        // undo..
+        // This is because we had a pointer count of 2, which will slowly go
+        // down to 1.
+        // ignoring this will result in the other view acting up an up event it
+        // shouldn't.
+        if (event.getAction() == MotionEvent.ACTION_UP && undo) {
+            return true;
+        }
+        undo = false;
         return dv.onTouchEvent(event);
     }
 }

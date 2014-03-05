@@ -58,6 +58,20 @@ public abstract class Brush {
         return r;
     }
 
+    public Stroke newStroke() {
+        return new Stroke(getMaxStrokeLength());
+    }
+
+    /**
+     * Max number of pixels we are willing to accept until a new stroke should
+     * be started.
+     * 
+     * @return
+     */
+    public int getMaxStrokeLength() {
+        return 16;
+    }
+
     public abstract void clear();
 
     /**

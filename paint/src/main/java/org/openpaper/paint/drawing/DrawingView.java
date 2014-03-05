@@ -29,7 +29,7 @@ public class DrawingView extends View {
     private Bitmap bitmap = null;
     private Canvas bitmapCanvas = null;
     private Brush brush = new PointBrush();
-    Stroke stroke = new Stroke();
+    private Stroke stroke;
     private ActionQueue actionQueue = new ActionQueue(this);
 
     public DrawingView(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -73,8 +73,7 @@ public class DrawingView extends View {
 
         switch (event.getAction()) {
         case MotionEvent.ACTION_DOWN:
-            stroke = new Stroke();
-            addPoint(null);
+            addToStroke(null);
             return true;
 
         case MotionEvent.ACTION_MOVE:
@@ -91,15 +90,13 @@ public class DrawingView extends View {
 
                 Point newPoint = new Point(historicalX, historicalY, pressure,
                         time);
-                stroke.add(newPoint);
-                addPoint(newPoint);
+                addToStroke(newPoint);
             }
 
             // After replaying history, connect the line to the touch point.
             Point newPoint = new Point(event.getX(), event.getY(),
                     event.getPressure(), event.getEventTime());
-            stroke.add(newPoint);
-            addPoint(newPoint);
+            addToStroke(newPoint);
 
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 this.actionQueue.addAction(new StrokeAction(stroke));
@@ -112,6 +109,17 @@ public class DrawingView extends View {
         }
 
         return true;
+    }
+
+    private void addToStroke(Point newPoint) {
+        if (stroke == null) {
+            stroke = brush.newStroke();
+        }
+        if (!stroke.add(newPoint)) {
+            this.actionQueue.addAction(new StrokeAction(stroke));
+            stroke = brush.newStroke();
+        }
+        addPoint(newPoint);
     }
 
     public Brush getBrush() {
@@ -141,5 +149,9 @@ public class DrawingView extends View {
 
     public Canvas getCanvas() {
         return bitmapCanvas;
+    }
+
+    public Bitmap getBitmap() {
+        return bitmap;
     }
 }

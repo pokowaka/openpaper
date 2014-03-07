@@ -1,14 +1,21 @@
 package org.openpaper.paint.action;
 
+import junit.framework.AssertionFailedError;
+
 import org.openpaper.paint.drawing.DrawingView;
+import org.openpaper.paint.drawing.brush.Brush;
 
 public class ClearScreenSnapshot extends PaintAction {
 
     private BrushStroke brush;
 
     public ClearScreenSnapshot(DrawingView dv) {
-        brush = new BrushStroke(dv.getBrush().getClass(), dv.getBrush()
-                .getColor());
+        try {
+            brush = new BrushStroke((Brush) dv.getBrush().clone());
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionFailedError(
+                    "Every brush should implement the clone method");
+        }
     }
 
     @Override

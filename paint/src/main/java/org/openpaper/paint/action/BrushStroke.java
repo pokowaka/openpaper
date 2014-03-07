@@ -19,11 +19,15 @@ public class BrushStroke extends PaintAction {
         }
     }
 
+    public BrushStroke(Brush b) {
+        this.brush = b;
+    }
+
     @Override
     void execute(DrawingView dv) {
         dv.setBrush(brush);
     }
-    
+
     @Override
     public boolean isBrush() {
         return true;

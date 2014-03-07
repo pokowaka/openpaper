@@ -6,6 +6,7 @@ import java.util.Queue;
 import org.openpaper.paint.drawing.Point;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
@@ -22,8 +23,8 @@ public class BezierBrush extends Brush {
     private float lastVelocity;
     private float lastWidth;
 
-
     public BezierBrush() {
+        init(Color.YELLOW);
     }
 
     public BezierBrush(float velocity, int stroke, int color) {
@@ -34,13 +35,13 @@ public class BezierBrush extends Brush {
 
     private void init(int color) {
         paint.setAntiAlias(true);
-        paint.setColor(color);
         paint.setAlpha(0x80);
         paint.setDither(true);
         paint.setStyle(Paint.Style.FILL);
         paint.setStrokeJoin(Paint.Join.ROUND);
         paint.setStrokeCap(Paint.Cap.ROUND);
         paint.setStrokeWidth(1);
+        this.setColor(color);
     }
 
     @Override
@@ -118,6 +119,12 @@ public class BezierBrush extends Brush {
     @Override
     public String getName() {
         return "Bezier";
+    }
+
+    @Override
+    public Brush clone() throws CloneNotSupportedException {
+        return new BezierBrush(this.velocityFilter, this.strokeWidth,
+                this.color);
     }
 
 }

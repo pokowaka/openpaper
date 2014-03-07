@@ -2,8 +2,8 @@ package org.openpaper.paint.drawing;
 
 import org.openpaper.paint.action.ActionQueue;
 import org.openpaper.paint.action.StrokeAction;
+import org.openpaper.paint.drawing.brush.BezierBrush;
 import org.openpaper.paint.drawing.brush.Brush;
-import org.openpaper.paint.drawing.brush.PointBrush;
 import org.openpaper.paint.drawing.brush.Stroke;
 
 import android.content.Context;
@@ -28,7 +28,7 @@ public class DrawingView extends View {
 
     private Bitmap bitmap = null;
     private Canvas bitmapCanvas = null;
-    private Brush brush = new PointBrush();
+    private Brush brush = new BezierBrush();
     private Stroke stroke;
     private ActionQueue actionQueue = new ActionQueue(this);
 

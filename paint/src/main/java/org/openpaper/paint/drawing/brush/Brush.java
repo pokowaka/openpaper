@@ -17,7 +17,7 @@ import android.graphics.Rect;
  * @author erwinj
  * 
  */
-public abstract class Brush {
+public abstract class Brush implements Cloneable {
 
     protected int color;
 
@@ -92,4 +92,8 @@ public abstract class Brush {
      * @return A user friendly name that can be used in a UI.
      */
     public abstract String getName();
+
+    @Override
+    public abstract Brush clone() throws CloneNotSupportedException;
+
 }

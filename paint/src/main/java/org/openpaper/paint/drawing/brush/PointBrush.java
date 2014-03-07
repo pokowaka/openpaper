@@ -21,11 +21,11 @@ public class PointBrush extends Brush {
 
     public PointBrush() {
         paint.setAntiAlias(true);
-        paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeJoin(Paint.Join.ROUND);
         paint.setStrokeCap(Paint.Cap.ROUND);
         paint.setStrokeWidth(5f);
+        setColor(Color.BLACK);
     }
 
     public PointBrush(int color) {
@@ -60,5 +60,10 @@ public class PointBrush extends Brush {
     @Override
     public String getName() {
         return "Point";
+    }
+
+    @Override
+    public Brush clone() throws CloneNotSupportedException {
+        return new PointBrush(this.getColor());
     }
 }

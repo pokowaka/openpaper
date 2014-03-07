@@ -125,4 +125,9 @@ public class PencilBrush extends Brush {
         return "Pencil";
     }
 
+    @Override
+    public Brush clone() throws CloneNotSupportedException {
+        return new PencilBrush(this.getColor());
+    }
+
 }

@@ -1,4 +1,4 @@
-apply plugin: 'android'
+apply plugin: 'android-library'
 
 android {
     compileSdkVersion 19
@@ -10,12 +10,12 @@ android {
         versionCode 1
         versionName "1.0"
     }
-    buildTypes {
-        release {
-            runProguard false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-        }
-    }
+    //buildTypes {
+    //  release {
+    //        runProguard false
+    //        proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+    //    }
+    //}
 }
 
 dependencies {

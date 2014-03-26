@@ -30,7 +30,7 @@ public class DrawingView extends View {
     private Canvas bitmapCanvas = null;
     private Brush brush = new BezierBrush();
     private Stroke stroke;
-    private ActionQueue actionQueue = new ActionQueue(this);
+    private ActionQueue actionQueue;
 
     public DrawingView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -99,7 +99,7 @@ public class DrawingView extends View {
             addToStroke(newPoint);
 
             if (event.getAction() == MotionEvent.ACTION_UP) {
-                this.actionQueue.addAction(new StrokeAction(stroke));
+                this.getActionQueue().addAction(new StrokeAction(stroke));
             }
             break;
 
@@ -116,7 +116,7 @@ public class DrawingView extends View {
             stroke = brush.newStroke();
         }
         if (!stroke.add(newPoint)) {
-            this.actionQueue.addAction(new StrokeAction(stroke));
+            this.getActionQueue().addAction(new StrokeAction(stroke));
             stroke = brush.newStroke();
         }
         addPoint(newPoint);
@@ -144,6 +144,8 @@ public class DrawingView extends View {
     }
 
     public ActionQueue getActionQueue() {
+        if (actionQueue == null)
+            actionQueue = new ActionQueue(this);
         return actionQueue;
     }
 
